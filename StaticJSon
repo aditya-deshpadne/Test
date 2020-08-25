@@ -1,0 +1,84 @@
+public class ConvertPAthtoJson {
+
+	public static void main(String[] args) {
+
+		String[] paths = { "/cab1", "/cab1/folder1", "/cab1/folder1/folder2", "/cab1/folder1/folder2/folder",
+				"/cab1/folder21", "/cab1/folder21/folder32" };
+
+		// String[] paths = { "/cab1", "/cab1/folder1", "/cab1/folder2"};
+
+		JSONObject jsonStructure = new JSONObject();
+		JSONObject pointer = jsonStructure;
+		for (String str : paths) {
+
+			StringTokenizer strTok = new StringTokenizer(str, "/");
+			boolean isValidPath = true;
+			pointer = jsonStructure;
+
+			while (strTok.hasMoreElements()) {
+				String key = strTok.nextElement().toString();
+				try {
+					if (pointer.has("parent")) {
+
+						pointer = pointer.getJSONObject("parent");
+
+					} else if (pointer.has("subArray")) {
+
+						JSONArray arr = pointer.getJSONArray("subArray");
+						boolean isChild = false;
+						for (int i = 0; i < arr.length(); i++) {
+
+							JSONObject temp = arr.getJSONObject(i);
+							if (temp.getString("Name").equals(key)) {
+								pointer = temp;
+								isChild = true;
+								break;
+
+							}
+						}
+						if (!isChild) {
+							JSONObject tmp = new JSONObject("{\"Name\":\"" + key + "\"}");
+							tmp.put("subArray", new JSONArray());
+							pointer.getJSONArray("subArray").put(tmp);
+						}
+
+					} else {
+
+						JSONObject tmp = new JSONObject("{\"Name\":\"" + key + "\"}");
+						tmp.put("subArray", new JSONArray());
+						if (pointer.has("subArray")) {
+
+							pointer.getJSONArray("subArray").put(tmp);
+
+						} else {
+							pointer.put("parent", tmp);
+						}
+
+						isValidPath = false;
+
+					}
+				} catch (Exception e) {
+					JSONObject tmp = new JSONObject("{\"Name\":\"" + key + "\"}");
+					tmp.put("subArray", new JSONArray());
+					if (pointer.has("subArray")) {
+
+						pointer.getJSONArray("subArray").put(tmp);
+
+					} else {
+						pointer.put("parent", tmp);
+					}
+
+					isValidPath = false;
+				}
+
+				// System.out.println(jsonStructure);
+			}
+
+		}
+
+		// System.out.println(pointer);
+		System.out.println(jsonStructure);
+
+	}
+
+}
