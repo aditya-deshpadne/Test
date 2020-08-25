@@ -1,0 +1,47 @@
+package com.test.path;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.json.JSONObject;
+
+public class ConvertPAthtoJson {
+
+	public static void main(String[] args) {
+
+		String[] paths = { "/cab1", "/cab1/folder1", "/cab1/folder1/folder2", "/cab1/folder1/folder2/folder",
+				"/cab1/folder21", "/cab1/folder21/folder32" };
+
+		JSONObject jsonStructure = new JSONObject();
+		JSONObject pointer = jsonStructure;
+		for (String str : paths) {
+
+			StringTokenizer strTok = new StringTokenizer(str, "/");
+			boolean isValidPath = true;
+			pointer = jsonStructure;
+			while (strTok.hasMoreElements()) {
+				String key = strTok.nextElement().toString();
+				try{
+					Object obj = pointer.get(key);
+					isValidPath = true;
+				} catch (Exception e) {
+					JSONObject tmp = new JSONObject();
+					pointer.put(key, tmp);
+					isValidPath = false;
+				} 
+				
+				if(isValidPath){
+					pointer = pointer.getJSONObject(key);
+				}
+				//System.out.println(jsonStructure);
+			}
+
+		}
+
+		//System.out.println(pointer);
+		System.out.println(jsonStructure);
+
+	}
+
+}
